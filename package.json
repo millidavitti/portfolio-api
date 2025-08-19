@@ -1,0 +1,36 @@
+{
+	"name": "portfolio-api",
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy --minify",
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
+		"drizzle": "npx drizzle-kit generate && npx drizzle-kit migrate",
+		"generate": "npx drizzle-kit generate",
+		"migrate": "npx drizzle-kit migrate",
+		"push": "npx drizzle-kit push",
+		"pull": "npx drizzle-kit pull",
+		"studio": "npx drizzle-kit studio"
+	},
+	"dependencies": {
+		"@hono/zod-validator": "^0.7.2",
+		"@paralleldrive/cuid2": "^2.2.2",
+		"@types/pg": "^8.15.5",
+		"chalk": "^5.5.0",
+		"cors": "^2.8.5",
+		"dotenv": "^16.4.7",
+		"drizzle-kit": "^0.31.4",
+		"drizzle-orm": "^0.39.3",
+		"express": "^4.21.2",
+		"express-session": "^1.18.1",
+		"hono": "^4.9.0",
+		"nodemailer": "^6.10.0",
+		"pg": "^8.13.1",
+		"resend": "^6.0.1",
+		"zod": "^3.24.2"
+	},
+	"devDependencies": {
+		"@types/nodemailer": "^6.4.17",
+		"wrangler": "^4.4.0"
+	}
+}

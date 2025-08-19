@@ -1,0 +1,12 @@
+# wrangler.toml
+
+name = "portfolio-api"
+main = "app/index.ts"
+compatibility_date = "2025-03-25"
+compatibility_flags = ["nodejs_compat"]
+
+[[hyperdrive]]
+binding = "PORTFOLIO_HYPERDRIVE"
+id = "4fd49cba02174cc0ba0fec837f42f792"
+localConnectionString = "postgres://postgres:mysecretpassword@localhost:5050/dev-db"
+
