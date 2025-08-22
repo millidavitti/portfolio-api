@@ -1,4 +1,4 @@
 import "dotenv/config";
 import { drizzle } from "drizzle-orm/node-postgres";
 
-export const db = (databaseUrl: string) => drizzle(databaseUrl);
+export const prepareDb = (databaseUrl: string) => drizzle(databaseUrl);
