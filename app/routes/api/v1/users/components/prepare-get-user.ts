@@ -2,22 +2,24 @@ import { prepareDb } from "@db/connect-db";
 import { userSchema } from "@db/schema/user.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { getErrorMessage } from "app/helpers/get-error-message";
+import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
-export function prepareCreateUser(dbUrl: string) {
-	return async (email: string, name: string) => {
+export function prepareGetUser(dbUrl: string) {
+	return async (userId: string) => {
 		try {
-			const [result] = await prepareDb(dbUrl)
-				.insert(userSchema)
-				.values({ email, name, emailVerified: new Date() })
-				.returning();
+			const db = prepareDb(dbUrl);
+			const [user] = await db
+				.select()
+				.from(userSchema)
+				.where(eq(userSchema.id, userId));
 
-			return result;
+			return user;
 		} catch (error) {
-			generateErrorLog("@prepareCreateUser", error);
+			generateErrorLog("@prepareGetUser", error);
 			throw new HTTPException(400, {
 				message: JSON.stringify({
-					message: "Sign in to continue. You have an account",
+					message: "We were unable to retrieve your data",
 				}),
 			});
 		}
