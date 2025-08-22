@@ -1,15 +1,15 @@
-import { db } from "@db/connect-db";
+import { prepareDb } from "@db/connect-db";
 import { userSchema } from "@db/schema/user.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { getErrorMessage } from "app/helpers/get-error-message";
 import { HTTPException } from "hono/http-exception";
 
-export function prepareCreateUser(email: string, name: string) {
-	return async (dbUrl: string) => {
+export function prepareCreateUser(dbUrl: string) {
+	return async (email: string, name: string) => {
 		try {
-			const [result] = await db(dbUrl)
+			const [result] = await prepareDb(dbUrl)
 				.insert(userSchema)
-				.values({ email, name })
+				.values({ email, name, emailVerified: new Date() })
 				.returning();
 
 			return result;

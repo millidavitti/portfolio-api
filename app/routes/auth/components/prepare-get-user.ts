@@ -1,4 +1,4 @@
-import { db } from "@db/connect-db";
+import { prepareDb } from "@db/connect-db";
 import { userSchema } from "@db/schema/user.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { getErrorMessage } from "app/helpers/get-error-message";
@@ -8,7 +8,7 @@ import { HTTPException } from "hono/http-exception";
 export function prepareGetUser(email: string) {
 	return async (dbUrl: string) => {
 		try {
-			const [result] = await db(dbUrl)
+			const [result] = await prepareDb(dbUrl)
 				.select({
 					id: userSchema.id,
 					name: userSchema.name,

@@ -6,8 +6,6 @@ export function prepareMagicLink(email: string, token: string) {
 	return async (apikey: string, from: string, origin: string) => {
 		try {
 			const magicLink = `${origin}/auth/sign-in/verification?token=${token}`;
-			console.log("magicLink: ", magicLink);
-			return;
 			await fetch("https://api.resend.com/emails", {
 				method: "POST",
 				headers: {
