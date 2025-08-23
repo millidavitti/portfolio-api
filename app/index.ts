@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { env } from "hono/adapter";
-import { Bindings } from "./cloudflare/bindings.worker";
+import { WorkerBindings } from "./cloudflare/bindings.worker";
 import { cors } from "hono/cors";
 import routes from "app/routes/index";
 
-const app = new Hono<{ Bindings: Bindings }>();
+const app = new Hono<{ Bindings: WorkerBindings }>();
 
 app.use(
 	cors({

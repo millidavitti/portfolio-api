@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { prepareVerificationEmail } from "./components/prepare-verification-email";
 import { createId } from "@paralleldrive/cuid2";
 import { env } from "hono/adapter";
-import { Bindings } from "app/cloudflare/bindings.worker";
+import { WorkerBindings } from "app/cloudflare/bindings.worker";
 import { sign, verify } from "hono/jwt";
 import { deleteCookie, setCookie } from "hono/cookie";
 import { HTTPException } from "hono/http-exception";
@@ -15,7 +15,7 @@ import { generateErrorLog } from "app/helpers/generate-error-log";
 import { prepareGetUser } from "./components/prepare-get-user";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
-const auth = new Hono<{ Bindings: Bindings }>();
+const auth = new Hono<{ Bindings: WorkerBindings }>();
 
 auth.post(
 	"/sign-up",

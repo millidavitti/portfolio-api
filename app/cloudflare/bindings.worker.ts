@@ -1,4 +1,4 @@
-export type Bindings = {
+export type WorkerBindings = {
 	DATABASE_URL: string;
 	PORTFOLIO_HYPERDRIVE: Hyperdrive;
 	RESEND_APIKEY: string;
