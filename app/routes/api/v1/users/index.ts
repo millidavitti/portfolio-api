@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { prepareGetUsers } from "./components/prepare-get-users";
 import { env } from "hono/adapter";
-import { Bindings } from "app/cloudflare/bindings.worker";
+import { WorkerBindings } from "app/cloudflare/bindings.worker";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { HTTPException } from "hono/http-exception";
 import { getErrorMessage } from "app/helpers/get-error-message";
@@ -11,10 +11,9 @@ import { decode } from "hono/jwt";
 import { prepareUpdateUser } from "./components/prepare-update-user";
 import { prepareDeleteUser } from "./components/prepare-delete-user";
 import { zValidator } from "@hono/zod-validator";
-import z from "zod";
 import { ZodUser } from "@db/schema/user.schema";
 
-const users = new Hono<{ Bindings: Bindings }>();
+const users = new Hono<{ Bindings: WorkerBindings }>();
 
 users.get("/", async (c) => {
 	try {
