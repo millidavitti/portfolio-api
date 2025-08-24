@@ -8,5 +8,5 @@ export function toSeconds(
 		day: 60 * 60 * 24,
 	} as const;
 
-	return duration * map[unit];
+	return duration * map[unit] + Math.floor(Date.now() / 1000);
 }
