@@ -3,6 +3,7 @@ import users from "./users";
 import { csrf } from "hono/csrf";
 import socials from "./socials";
 import technologies from "./technologies";
+import projectTechnologies from "./project-technologies";
 
 const v1 = new Hono();
 v1.use(
@@ -13,5 +14,6 @@ v1.use(
 v1.route("/users", users);
 v1.route("/socials", socials);
 v1.route("/technologies", technologies);
+v1.route("/project-technologies", projectTechnologies);
 
 export default v1;
