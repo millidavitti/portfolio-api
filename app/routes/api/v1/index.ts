@@ -5,6 +5,7 @@ import socials from "./socials";
 import technologies from "./technologies";
 import projectTechnologies from "./projects/technologies";
 import projects from "./projects";
+import profiles from "./profile";
 
 const v1 = new Hono();
 v1.use(
@@ -17,5 +18,6 @@ v1.route("/socials", socials);
 v1.route("/technologies", technologies);
 v1.route("/projects", projects);
 v1.route("/project-technologies", projectTechnologies);
+v1.route("/profiles", profiles);
 
 export default v1;
