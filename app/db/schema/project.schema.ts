@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { AnyPgColumn, text } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
 import { profileSchema } from "./profile.schema";
+import z from "zod";
 
 export const projectSchema = pgTable("projects", {
 	id: text()
@@ -14,3 +15,11 @@ export const projectSchema = pgTable("projects", {
 	description: text().notNull(),
 	thumbnail: text().notNull(),
 });
+
+export const ZodProject = z.object({
+	id: z.string().cuid2().default(createId()),
+	title: z.string(),
+	description: z.string(),
+	thumbnail: z.string().url(),
+});
+export type Project = z.infer<typeof ZodProject>;
