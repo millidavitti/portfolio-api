@@ -67,7 +67,7 @@ projectTechnologies.onError((error, c) => {
 	}
 	c.status(500);
 	return c.json({
-		error: { message: "Internal Server Error: Technologies" },
+		error: { message: "Internal Server Error: Project Technologies" },
 	});
 });
 export default projectTechnologies;
