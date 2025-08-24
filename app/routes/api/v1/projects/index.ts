@@ -12,6 +12,7 @@ import {
 import { zValidator } from "@hono/zod-validator";
 import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
+import { prepareUpdateProject } from "./components/prepare-update-project";
 
 const projects = new Hono<{ Bindings: WorkerBindings }>();
 
@@ -48,6 +49,30 @@ projects.post("/:profileId", zValidator("json", ZodProjectData), async (c) => {
 		const json = c.req.valid("json");
 		await createProject(profileId, json);
 		return c.json({ message: "You have created a project" });
+	} catch (error) {
+		generateErrorLog("projects.post@/profileId", error);
+		const message = getErrorMessage(error);
+		if (error instanceof HTTPException)
+			throw new HTTPException(400, {
+				message: JSON.parse(message).message,
+			});
+	}
+});
+
+projects.patch("/:profileId", zValidator("json", ZodProjectData), async (c) => {
+	try {
+		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
+		const Cookie = c.req.header("Cookie") || "";
+		const parsedCookies = parseCookies(Cookie);
+		const token = parsedCookies["portfolio.authenticated"];
+		await verfiyToken(token, AUTH_SECRET);
+		const updateProject = prepareUpdateProject(
+			PORTFOLIO_HYPERDRIVE.connectionString,
+		);
+		const profileId = c.req.param("profileId");
+		const json = c.req.valid("json");
+		await updateProject(profileId, json);
+		return c.json({ message: "You update has been applied" });
 	} catch (error) {
 		generateErrorLog("projects.post@/profileId", error);
 		const message = getErrorMessage(error);
