@@ -16,10 +16,4 @@ app.use(
 
 app.route("/", routes);
 
-app.get("/", async (c) => {
-	const { PORTFOLIO_HYPERDRIVE } = env(c);
-
-	return c.json(PORTFOLIO_HYPERDRIVE);
-});
-
 export default app;
