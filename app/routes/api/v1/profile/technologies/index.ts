@@ -66,7 +66,7 @@ profileTechnologies.onError((error, c) => {
 	}
 	c.status(500);
 	return c.json({
-		error: { message: "Internal Server Error: Profiles" },
+		error: { message: "Internal Server Error: Profile Technologies" },
 	});
 });
 export default profileTechnologies;
