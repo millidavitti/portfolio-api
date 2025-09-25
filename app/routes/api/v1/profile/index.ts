@@ -15,25 +15,6 @@ import { prepareDeleteProfile } from "./components/prepare-delete-profile";
 
 const profiles = new Hono<{ Bindings: WorkerBindings }>();
 
-profiles.get("/:userId", async (c) => {
-	try {
-		const { PORTFOLIO_HYPERDRIVE } = env(c);
-		const getProfiles = prepareGetProfiles(
-			PORTFOLIO_HYPERDRIVE.connectionString,
-		);
-		const userId = c.req.param("userId");
-		const profiles = await getProfiles(userId);
-		return c.json({ data: profiles });
-	} catch (error) {
-		generateErrorLog("profiles.get@/me", error);
-		const message = getErrorMessage(error);
-		if (error instanceof HTTPException)
-			throw new HTTPException(400, {
-				message: JSON.parse(message).message,
-			});
-	}
-});
-
 profiles.get("/me", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
@@ -57,7 +38,7 @@ profiles.get("/me", async (c) => {
 	}
 });
 
-profiles.post("/me", zValidator("json", ZodProfile), async (c) => {
+profiles.post("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const Cookie = c.req.header("Cookie") || "";
@@ -81,19 +62,19 @@ profiles.post("/me", zValidator("json", ZodProfile), async (c) => {
 	}
 });
 
-profiles.patch("/me", zValidator("json", ZodProfile), async (c) => {
+profiles.patch("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const Cookie = c.req.header("Cookie") || "";
 		const parsedCookies = parseCookies(Cookie);
 		const token = parsedCookies["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		await verfiyToken(token, AUTH_SECRET);
 		const updateProfile = prepareUpdateProfile(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
-		const userId = payload?.sub as string;
+
 		const json = c.req.valid("json");
-		await updateProfile(userId, json);
+		await updateProfile(json);
 		return c.json({ message: "Your profile has been updated" });
 	} catch (error) {
 		generateErrorLog("profiles.patch@/me", error);
@@ -105,18 +86,18 @@ profiles.patch("/me", zValidator("json", ZodProfile), async (c) => {
 	}
 });
 
-profiles.delete("/me", zValidator("json", ZodProfile), async (c) => {
+profiles.delete("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const Cookie = c.req.header("Cookie") || "";
 		const parsedCookies = parseCookies(Cookie);
 		const token = parsedCookies["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		await verfiyToken(token, AUTH_SECRET);
 		const deleteProfile = prepareDeleteProfile(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
-		const userId = payload?.sub as string;
-		await deleteProfile(userId);
+		const json = c.req.valid("json");
+		await deleteProfile(json);
 		return c.json({ message: "Your profile has been deleted" });
 	} catch (error) {
 		generateErrorLog("profiles.delete@/me", error);
