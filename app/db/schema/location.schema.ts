@@ -17,10 +17,8 @@ export const locationSchema = pgTable("locations", {
 });
 
 export const ZodLocation = z.object({
-	id: z.string().min(1),
-	userId: z.string().min(1),
-	city: z.string().min(1),
-	country: z.string().min(1),
+	city: z.string(),
+	country: z.string(),
 });
 
 export type Location = z.infer<typeof ZodLocation>;
