@@ -6,7 +6,7 @@ import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export function prepareUpdateUser(dbUrl: string) {
-	return async (userId: string, update: User) => {
+	return async (userId: string, update: Partial<User>) => {
 		try {
 			const db = prepareDb(dbUrl);
 			const [result] = await db
