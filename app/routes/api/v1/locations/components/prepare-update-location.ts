@@ -1,22 +1,20 @@
 import { prepareDb } from "@db/connect-db";
 import { Location, locationSchema } from "@db/schema/location.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
+import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export function prepareUpdateLocation(dbUrl: string) {
-	return async (userId: string, update: Location) => {
+	return async (userId: string, update: Partial<Location>) => {
 		try {
 			const db = prepareDb(dbUrl);
 			const [result] = await db
-				.insert(locationSchema)
-				.values({
+				.update(locationSchema)
+				.set({
 					...update,
 					userId,
 				})
-				.onConflictDoUpdate({
-					target: locationSchema.userId,
-					set: { ...update },
-				})
+				.where(eq(locationSchema.userId, userId))
 				.returning();
 			return result;
 		} catch (error) {

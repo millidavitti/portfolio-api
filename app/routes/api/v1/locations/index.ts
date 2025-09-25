@@ -36,7 +36,7 @@ locations.get("/me", async (c) => {
 	}
 });
 
-locations.patch("/me", zValidator("json", ZodLocation), async (c) => {
+locations.patch("/me", zValidator("json", ZodLocation.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const Cookie = c.req.header("Cookie") || "";
