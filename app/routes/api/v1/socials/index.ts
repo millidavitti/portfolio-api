@@ -90,7 +90,7 @@ socials.post("/me", zValidator("json", ZodSocials), async (c) => {
 	}
 });
 
-socials.patch("/:socialsId", zValidator("json", ZodSocials), async (c) => {
+socials.patch("/me", zValidator("json", ZodSocials), async (c) => {
 	const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
 	const Cookie = c.req.header("Cookie") || "";
 	const parsedCookies = parseCookies(Cookie);
@@ -108,16 +108,18 @@ socials.patch("/:socialsId", zValidator("json", ZodSocials), async (c) => {
 				});
 		}
 	})();
-	const socialsId = c.req.param("socialsId");
+
 	const json = c.req.valid("json");
+	console.log(json);
 	const updateSocials = prepareUpdateSocials(
 		PORTFOLIO_HYPERDRIVE.connectionString,
 	);
-	await updateSocials(socialsId, json);
+	await updateSocials(json);
 	return c.json({ message: "Your socials has been updated" });
 });
 
-socials.delete("/:socialsId", async (c) => {
+socials.delete("/:socialId", async (c) => {
+	console.log("first");
 	const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
 	const Cookie = c.req.header("Cookie") || "";
 	const parsedCookies = parseCookies(Cookie);
@@ -135,12 +137,12 @@ socials.delete("/:socialsId", async (c) => {
 				});
 		}
 	})();
-	const socialsId = c.req.param("socialsId");
+	const socialId = c.req.param("socialId");
 
 	const deleteSocials = prepareDeleteSocials(
 		PORTFOLIO_HYPERDRIVE.connectionString,
 	);
-	await deleteSocials(socialsId);
+	await deleteSocials(socialId);
 	return c.json({ message: "Your socials has been deleted" });
 });
 

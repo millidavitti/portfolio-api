@@ -5,13 +5,13 @@ import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export function prepareUpdateSocials(dbUrl: string) {
-	return async (socialsId: string, update: Socials) => {
+	return async (socials: Socials) => {
 		try {
 			const db = prepareDb(dbUrl);
 			const [result] = await db
 				.update(socialsSchema)
-				.set(update)
-				.where(eq(socialsSchema.id, socialsId))
+				.set(socials)
+				.where(eq(socialsSchema.id, socials.id!))
 				.returning();
 
 			return result;
