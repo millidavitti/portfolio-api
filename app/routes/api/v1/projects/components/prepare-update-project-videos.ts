@@ -1,7 +1,7 @@
 import {
 	ProjectVideo,
 	projectVideoSchema,
-} from "@db/schema/project-content/project-video.schema";
+} from "@db/schema/project/project-video.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { ExtractTablesWithRelations, and, eq, notInArray } from "drizzle-orm";
 import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";

@@ -1,6 +1,6 @@
-import { ProjectImage } from "@db/schema/project-content/project-image.schema";
-import { ProjectMarkdown } from "@db/schema/project-content/project-markdown.schema";
-import { ProjectVideo } from "@db/schema/project-content/project-video.schema";
+import { ProjectImage } from "@db/schema/project/project-image.schema";
+import { ProjectMarkdown } from "@db/schema/project/project-markdown.schema";
+import { ProjectVideo } from "@db/schema/project/project-video.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { ExtractTablesWithRelations } from "drizzle-orm";
 import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
@@ -18,16 +18,25 @@ export function prepareCreateProjectContent(
 	>,
 ) {
 	return async (projectId: string, content: ProjectContent) => {
+		console.log(content);
 		try {
-			const projectImages = content.filter(
-				(content) => content.type === "image",
-			);
-			const projectVideos = content.filter(
-				(content) => content.type === "video",
-			);
-			const projectMarkdowns = content.filter(
-				(content) => content.type === "markdown",
-			);
+			const projectImages: ProjectImage[] = [];
+			const projectVideos: ProjectVideo[] = [];
+			const projectMarkdowns: ProjectMarkdown[] = [];
+
+			for (const element of content) {
+				switch (element.type) {
+					case "image":
+						projectImages.push(element);
+						break;
+					case "video":
+						projectVideos.push(element);
+						break;
+					case "markdown":
+						projectMarkdowns.push(element);
+						break;
+				}
+			}
 			const createProjectImages = prepareCreateProjectImages(tx);
 			const createProjectVideos = prepareCreateProjectVideos(tx);
 			const createProjectMarkdowns = prepareCreateProjectMarkdowns(tx);

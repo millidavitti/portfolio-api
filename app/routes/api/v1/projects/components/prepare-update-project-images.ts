@@ -1,7 +1,7 @@
 import {
 	ProjectImage,
 	projectImageSchema,
-} from "@db/schema/project-content/project-image.schema";
+} from "@db/schema/project/project-image.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { ExtractTablesWithRelations, and, eq, notInArray } from "drizzle-orm";
 import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";

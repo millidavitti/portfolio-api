@@ -1,7 +1,7 @@
 import {
 	ProjectMarkdown,
 	projectMarkdownSchema,
-} from "@db/schema/project-content/project-markdown.schema";
+} from "@db/schema/project/project-markdown.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { ExtractTablesWithRelations, and, eq, notInArray } from "drizzle-orm";
 import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";

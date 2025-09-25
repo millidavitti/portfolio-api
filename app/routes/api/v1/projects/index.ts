@@ -14,6 +14,8 @@ import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { prepareUpdateProject } from "./components/prepare-update-project";
 import { prepareDeleteProject } from "./components/prepare-delete-project";
+import projectTechnologies from "./technologies";
+import { projectContent } from "./content";
 
 const projects = new Hono<{ Bindings: WorkerBindings }>();
 
@@ -110,6 +112,9 @@ projects.delete(
 		}
 	},
 );
+
+projects.route("/technologies", projectTechnologies);
+projects.route("/content", projectContent);
 
 projects.onError((error, c) => {
 	if (error instanceof HTTPException) {
