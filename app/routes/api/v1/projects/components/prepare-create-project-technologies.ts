@@ -1,4 +1,4 @@
-import { projectTechnologySchema } from "@db/schema/project-technology.schema";
+import { projectTechnologySchema } from "@db/schema/project/technology.schema";
 import { Technology } from "@db/schema/technology.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { ExtractTablesWithRelations } from "drizzle-orm";
