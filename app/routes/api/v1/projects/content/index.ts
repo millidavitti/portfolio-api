@@ -17,11 +17,11 @@ projectContent.get("/:projectId", async (c) => {
 		const parsedCookies = parseCookies(Cookie);
 		const token = parsedCookies["portfolio.authenticated"];
 		await verfiyToken(token, AUTH_SECRET);
-		const getProjectTechnologies = prepareGetProjectContent(
+		const getProjectContent = prepareGetProjectContent(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
 		const projectId = c.req.param("projectId");
-		const projectContent = await getProjectTechnologies(projectId);
+		const projectContent = await getProjectContent(projectId);
 		return c.json({ data: projectContent });
 	} catch (error) {
 		generateErrorLog("projectContent.get@/:", error);
