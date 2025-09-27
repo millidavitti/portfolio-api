@@ -17,7 +17,7 @@ export const projectSchema = pgTable("projects", {
 });
 
 export const ZodProject = z.object({
-	id: z.string().cuid2().default(createId()),
+	id: z.string().cuid2().optional(),
 	title: z.string(),
 	description: z.string(),
 	thumbnail: z.string().url(),

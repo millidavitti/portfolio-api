@@ -9,7 +9,7 @@ import { HTTPException } from "hono/http-exception";
 import { getErrorMessage } from "app/helpers/get-error-message";
 import { toSeconds } from "app/helpers/to-seconds";
 import { prepareCreateUser } from "./components/prepare-create-user";
-import { prepareMagicLink } from "./components/prepare-magic-link.model";
+import { prepareSendMagicLink } from "./components/prepare-magic-link.model";
 import { parseCookies } from "app/helpers/parse-cookies";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { prepareGetUser } from "./components/prepare-get-user";
@@ -102,7 +102,7 @@ auth.get("/verify-email/:token", async (c) => {
 						sub: user?.id,
 						iss: "portfolio",
 						iat: Math.floor(Date.now() / 1000),
-						exp: Math.floor(Date.now() / 1000) + toSeconds(7, "day"),
+						exp: toSeconds(7, "day"),
 					},
 					AUTH_SECRET,
 				);
@@ -154,8 +154,12 @@ auth.post(
 				AUTH_SECRET,
 			);
 
-			const sendMagicLink = prepareMagicLink(email, token);
-			await sendMagicLink(RESEND_APIKEY, RESEND_FROM, ORIGIN);
+			const sendMagicLink = prepareSendMagicLink(
+				RESEND_APIKEY,
+				RESEND_FROM,
+				ORIGIN,
+			);
+			await sendMagicLink(email, token);
 
 			setCookie(c, "portfolio.authenticating", token);
 

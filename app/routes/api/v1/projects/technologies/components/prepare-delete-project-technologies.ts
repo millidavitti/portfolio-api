@@ -1,7 +1,6 @@
 import { prepareDb } from "@db/connect-db";
-import { projectTechnologySchema } from "@db/schema/project-technology.schema";
+import { projectTechnologySchema } from "@db/schema/project/technology.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
-import { getErrorMessage } from "app/helpers/get-error-message";
 import { and, eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 

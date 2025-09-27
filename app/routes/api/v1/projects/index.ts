@@ -14,6 +14,8 @@ import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { prepareUpdateProject } from "./components/prepare-update-project";
 import { prepareDeleteProject } from "./components/prepare-delete-project";
+import projectTechnologies from "./technologies";
+import { projectContent } from "./content";
 
 const projects = new Hono<{ Bindings: WorkerBindings }>();
 
@@ -60,7 +62,7 @@ projects.post("/:profileId", zValidator("json", ZodProjectData), async (c) => {
 	}
 });
 
-projects.patch("/:projectId", zValidator("json", ZodProjectData), async (c) => {
+projects.patch("/", zValidator("json", ZodProjectData), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const Cookie = c.req.header("Cookie") || "";
@@ -70,9 +72,9 @@ projects.patch("/:projectId", zValidator("json", ZodProjectData), async (c) => {
 		const updateProject = prepareUpdateProject(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
-		const projectId = c.req.param("projectId");
+
 		const json = c.req.valid("json");
-		await updateProject(projectId, json);
+		await updateProject(json);
 		return c.json({ message: "Your update has been applied" });
 	} catch (error) {
 		generateErrorLog("projects.patch@/projectId", error);
@@ -84,32 +86,31 @@ projects.patch("/:projectId", zValidator("json", ZodProjectData), async (c) => {
 	}
 });
 
-projects.delete(
-	"/:projectId",
-	zValidator("json", ZodProjectData),
-	async (c) => {
-		try {
-			const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-			const Cookie = c.req.header("Cookie") || "";
-			const parsedCookies = parseCookies(Cookie);
-			const token = parsedCookies["portfolio.authenticated"];
-			await verfiyToken(token, AUTH_SECRET);
-			const deleteProject = prepareDeleteProject(
-				PORTFOLIO_HYPERDRIVE.connectionString,
-			);
-			const projectId = c.req.param("projectId");
-			await deleteProject(projectId);
-			return c.json({ message: "Your project has been deleted" });
-		} catch (error) {
-			generateErrorLog("projects.delete@/projectId", error);
-			const message = getErrorMessage(error);
-			if (error instanceof HTTPException)
-				throw new HTTPException(400, {
-					message: JSON.parse(message).message,
-				});
-		}
-	},
-);
+projects.delete("/:projectId", async (c) => {
+	try {
+		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
+		const Cookie = c.req.header("Cookie") || "";
+		const parsedCookies = parseCookies(Cookie);
+		const token = parsedCookies["portfolio.authenticated"];
+		await verfiyToken(token, AUTH_SECRET);
+		const deleteProject = prepareDeleteProject(
+			PORTFOLIO_HYPERDRIVE.connectionString,
+		);
+		const projectId = c.req.param("projectId");
+		await deleteProject(projectId);
+		return c.json({ message: "Your project has been deleted" });
+	} catch (error) {
+		generateErrorLog("projects.delete@/projectId", error);
+		const message = getErrorMessage(error);
+		if (error instanceof HTTPException)
+			throw new HTTPException(400, {
+				message: JSON.parse(message).message,
+			});
+	}
+});
+
+projects.route("/technologies", projectTechnologies);
+projects.route("/content", projectContent);
 
 projects.onError((error, c) => {
 	if (error instanceof HTTPException) {

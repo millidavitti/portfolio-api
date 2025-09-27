@@ -1,15 +1,12 @@
 import { prepareDb } from "@db/connect-db";
 import { projectSchema, ZodProject } from "@db/schema/project.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
-import { getErrorMessage } from "app/helpers/get-error-message";
 import { HTTPException } from "hono/http-exception";
 import { prepareCreateProjectTechnologies } from "./prepare-create-project-technologies";
 import { prepareCreateProjectContent } from "./prepare-create-project-content";
-import { ZodProjectImage } from "@db/schema/project-content/project-image.schema";
-import { ZodProjectMarkdown } from "@db/schema/project-content/project-markdown.schema";
-import { ZodProjectVideo } from "@db/schema/project-content/project-video.schema";
 import { ZodTechnology } from "@db/schema/technology.schema";
 import z from "zod";
+import { ZodProjectContent } from "@db/schema/project/content.schema";
 
 export function prepareCreateProject(dbUrl: string) {
 	return async (profileId: string, project: ProjectData) => {
@@ -43,9 +40,7 @@ export function prepareCreateProject(dbUrl: string) {
 export const ZodProjectData = z.object({
 	project: ZodProject,
 	technologies: ZodTechnology.array(),
-	content: z
-		.union([ZodProjectImage, ZodProjectVideo, ZodProjectMarkdown])
-		.array(),
+	content: ZodProjectContent.array(),
 });
 
 export type ProjectData = z.infer<typeof ZodProjectData>;

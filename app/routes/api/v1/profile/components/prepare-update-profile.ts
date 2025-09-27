@@ -5,14 +5,14 @@ import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
 export function prepareUpdateProfile(dbUrl: string) {
-	return async (profileId: string, update: Profile) => {
+	return async (update: Partial<Profile>) => {
 		try {
 			const db = prepareDb(dbUrl);
 
 			const [result] = await db
 				.update(profileSchema)
 				.set(update)
-				.where(eq(profileSchema.id, profileId))
+				.where(eq(profileSchema.id, update.id!))
 				.returning();
 
 			return result;

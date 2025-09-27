@@ -8,7 +8,7 @@ import { prepareUpdateProjectTechnologies } from "./prepare-update-project-techn
 import { prepareUpdateProjectContent } from "./prepare-update-project-content";
 
 export function prepareUpdateProject(dbUrl: string) {
-	return async (projectId: string, update: ProjectData) => {
+	return async (update: ProjectData) => {
 		try {
 			const db = prepareDb(dbUrl);
 			const project = await db.transaction(async (tx) => {
@@ -16,13 +16,16 @@ export function prepareUpdateProject(dbUrl: string) {
 				const [project] = await tx
 					.update(projectSchema)
 					.set(rest)
-					.where(eq(projectSchema.id, projectId))
+					.where(eq(projectSchema.id, update.project.id!))
 					.returning();
 				const updateProjectTechnologies = prepareUpdateProjectTechnologies(tx);
-				await updateProjectTechnologies(projectId, update.technologies);
+				await updateProjectTechnologies(
+					update.project.id!,
+					update.technologies,
+				);
 
 				const updateProjectContent = prepareUpdateProjectContent(tx);
-				await updateProjectContent(projectId, update.content);
+				await updateProjectContent(update.project.id!, update.content);
 				return project;
 			});
 			return project;

@@ -1,7 +1,7 @@
 import { primaryKey, text } from "drizzle-orm/pg-core";
 import { pgTable } from "drizzle-orm/pg-core";
-import { projectSchema } from "./project.schema";
-import { technologySchema } from "./technology.schema";
+import { projectSchema } from "../project.schema";
+import { technologySchema } from "../technology.schema";
 
 export const projectTechnologySchema = pgTable(
 	"project_technologies",

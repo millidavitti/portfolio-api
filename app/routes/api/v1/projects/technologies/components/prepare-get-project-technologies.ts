@@ -1,5 +1,5 @@
 import { prepareDb } from "@db/connect-db";
-import { projectTechnologySchema } from "@db/schema/project-technology.schema";
+import { projectTechnologySchema } from "@db/schema/project/technology.schema";
 import { technologySchema } from "@db/schema/technology.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { groupByField } from "app/helpers/group-by-fields";

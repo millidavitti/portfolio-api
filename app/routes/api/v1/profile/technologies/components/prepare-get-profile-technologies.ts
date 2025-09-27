@@ -2,7 +2,6 @@ import { prepareDb } from "@db/connect-db";
 import { profileTechnologySchema } from "@db/schema/profile-technology.schema";
 import { technologySchema } from "@db/schema/technology.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
-import { getErrorMessage } from "app/helpers/get-error-message";
 import { groupByField } from "app/helpers/group-by-fields";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";

@@ -7,14 +7,17 @@ import { HTTPException } from "hono/http-exception";
 import { getErrorMessage } from "app/helpers/get-error-message";
 import { prepareGetUser } from "./components/prepare-get-user";
 import { parseCookies } from "app/helpers/parse-cookies";
-import { decode } from "hono/jwt";
 import { prepareUpdateUser } from "./components/prepare-update-user";
 import { prepareDeleteUser } from "./components/prepare-delete-user";
 import { zValidator } from "@hono/zod-validator";
 import { ZodUser } from "@db/schema/user.schema";
+import { verfiyToken } from "app/helpers/verify-token";
 
 const users = new Hono<{ Bindings: WorkerBindings }>();
-
+// users.use("*", async (c, next) => {
+// 	await next();
+// 	console.log("Users Response headers:", c.res.headers);
+// });
 users.get("/", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE } = env(c);
@@ -40,12 +43,12 @@ users.get("/", async (c) => {
 
 users.get("/me", async (c) => {
 	try {
-		const { PORTFOLIO_HYPERDRIVE } = env(c);
+		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
 		const Cookies = c.req.header("Cookie") || "";
 		const cookie = parseCookies(Cookies);
 		const token = cookie["portfolio.authenticated"];
-		const { payload } = decode(token);
-		const userId = payload.sub as string;
+		const payload = await verfiyToken(token, AUTH_SECRET);
+		const userId = payload?.sub as string;
 		const getUser = prepareGetUser(PORTFOLIO_HYPERDRIVE.connectionString);
 		const user = await getUser(userId);
 		return c.json({ data: user });
@@ -66,14 +69,14 @@ users.get("/me", async (c) => {
 	}
 });
 
-users.patch("/me", zValidator("json", ZodUser), async (c) => {
+users.patch("/me", zValidator("json", ZodUser.partial()), async (c) => {
 	try {
-		const { PORTFOLIO_HYPERDRIVE } = env(c);
+		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
 		const Cookies = c.req.header("Cookie") || "";
 		const cookie = parseCookies(Cookies);
 		const token = cookie["portfolio.authenticated"];
-		const { payload } = decode(token);
-		const userId = payload.sub as string;
+		const payload = await verfiyToken(token, AUTH_SECRET);
+		const userId = payload?.sub as string;
 		const update = c.req.valid("json");
 		const updateUser = prepareUpdateUser(PORTFOLIO_HYPERDRIVE.connectionString);
 		await updateUser(userId, update);
@@ -98,12 +101,12 @@ users.patch("/me", zValidator("json", ZodUser), async (c) => {
 
 users.delete("/me", async (c) => {
 	try {
-		const { PORTFOLIO_HYPERDRIVE } = env(c);
+		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
 		const Cookies = c.req.header("Cookie") || "";
 		const cookie = parseCookies(Cookies);
 		const token = cookie["portfolio.authenticated"];
-		const { payload } = decode(token);
-		const userId = payload.sub as string;
+		const payload = await verfiyToken(token, AUTH_SECRET);
+		const userId = payload?.sub as string;
 		const deleteUser = prepareDeleteUser(PORTFOLIO_HYPERDRIVE.connectionString);
 		await deleteUser(userId);
 

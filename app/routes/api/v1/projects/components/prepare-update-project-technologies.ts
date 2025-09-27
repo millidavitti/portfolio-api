@@ -1,7 +1,6 @@
-import { projectTechnologySchema } from "@db/schema/project-technology.schema";
-import { Technology, ZodTechnology } from "@db/schema/technology.schema";
+import { projectTechnologySchema } from "@db/schema/project/technology.schema";
+import { Technology } from "@db/schema/technology.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
-import { getErrorMessage } from "app/helpers/get-error-message";
 import { ExtractTablesWithRelations, and, eq, notInArray } from "drizzle-orm";
 import { NodePgQueryResultHKT } from "drizzle-orm/node-postgres";
 import { PgTransaction } from "drizzle-orm/pg-core";
