@@ -34,32 +34,6 @@ projectContent.get("/:projectId", async (c) => {
 	}
 });
 
-// projectContent.delete("/:projectId/:technologyId", async (c) => {
-// 	try {
-// 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-// 		const Cookie = c.req.header("Cookie") || "";
-// 		const parsedCookies = parseCookies(Cookie);
-// 		const token = parsedCookies["portfolio.authenticated"];
-// 		await verfiyToken(token, AUTH_SECRET);
-// 		const deleteProjectTechnology = prepareDeleteProjectTechnology(
-// 			PORTFOLIO_HYPERDRIVE.connectionString,
-// 		);
-// 		const projectId = c.req.param("projectId");
-// 		const technologyId = c.req.param("technologyId");
-// 		await deleteProjectTechnology(projectId, technologyId);
-
-// 		return c.json({ message: "Your update has been applied" });
-// 	} catch (error) {
-// 		generateErrorLog("projectContent.get@/:", error);
-// 		const message = getErrorMessage(error);
-
-// 		if (error instanceof HTTPException)
-// 			throw new HTTPException(400, {
-// 				message: JSON.parse(message).message,
-// 			});
-// 	}
-// });
-
 projectContent.onError((error, c) => {
 	if (error instanceof HTTPException) {
 		return error.getResponse();
