@@ -32,9 +32,9 @@ export const ZodProjectContent = z.object({
 	id: z.string().cuid2().optional(),
 	type: z.enum(["image", "video", "markdown"]),
 	position: z.number(),
-	url: z.string().url().nullable(),
-	caption: z.string().optional().nullable(),
-	markdown: z.string().optional().nullable(),
+	url: z.string().url().nullable().optional(),
+	caption: z.string().optional().nullable().optional(),
+	markdown: z.string().optional().nullable().optional(),
 });
 
 export type ProjectContent = z.infer<typeof ZodProjectContent>;
