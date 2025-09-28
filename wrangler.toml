@@ -10,3 +10,10 @@ binding = "PORTFOLIO_HYPERDRIVE"
 id = "4fd49cba02174cc0ba0fec837f42f792"
 localConnectionString = "postgres://postgres:mysecretpassword@localhost:5050/dev-db"
 
+[observability.logs]
+enabled = true
+
+
+
+
+
