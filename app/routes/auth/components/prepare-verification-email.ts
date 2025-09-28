@@ -6,8 +6,6 @@ export function prepareVerificationEmail(email: string, token: string) {
 	return async (apikey: string, from: string, origin: string) => {
 		try {
 			const emailVerificationLink = `${origin}/auth/sign-up/verify-email/?token=${token}`;
-			console.log("emailVerificationLink:", emailVerificationLink);
-
 			await fetch("https://api.resend.com/emails", {
 				method: "POST",
 				headers: {
