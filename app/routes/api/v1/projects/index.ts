@@ -10,12 +10,12 @@ import {
 	ZodProjectData,
 } from "./components/prepare-create-project";
 import { zValidator } from "@hono/zod-validator";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { prepareUpdateProject } from "./components/prepare-update-project";
 import { prepareDeleteProject } from "./components/prepare-delete-project";
 import projectTechnologies from "./technologies";
 import { projectContent } from "./content";
+import { getCookie } from "hono/cookie";
 
 const projects = new Hono<{ Bindings: WorkerBindings }>();
 
@@ -41,10 +41,9 @@ projects.get("/:profileId", async (c) => {
 projects.post("/:profileId", zValidator("json", ZodProjectData), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const createProject = prepareCreateProject(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
@@ -65,14 +64,12 @@ projects.post("/:profileId", zValidator("json", ZodProjectData), async (c) => {
 projects.patch("/", zValidator("json", ZodProjectData), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const updateProject = prepareUpdateProject(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
-
 		const json = c.req.valid("json");
 		await updateProject(json);
 		return c.json({ message: "Your update has been applied" });
@@ -89,10 +86,9 @@ projects.patch("/", zValidator("json", ZodProjectData), async (c) => {
 projects.delete("/:projectId", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const deleteProject = prepareDeleteProject(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);

@@ -2,8 +2,12 @@ import { emailVerificationTemplate } from "./email/email-verification";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { HTTPException } from "hono/http-exception";
 
-export function prepareVerificationEmail(email: string, token: string) {
-	return async (apikey: string, from: string, origin: string) => {
+export function prepareVerificationEmail(
+	apikey: string,
+	from: string,
+	origin: string,
+) {
+	return async (email: string, token: string) => {
 		try {
 			const emailVerificationLink = `${origin}/auth/sign-up/verify-email/?token=${token}`;
 			await fetch("https://api.resend.com/emails", {

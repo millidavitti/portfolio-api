@@ -5,23 +5,22 @@ import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { HTTPException } from "hono/http-exception";
 import { prepareGetProfiles } from "./components/prepare-get-profiles";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { prepareCreateProfile } from "./components/prepare-create-profile";
 import { zValidator } from "@hono/zod-validator";
 import { ZodProfile } from "@db/schema/profile.schema";
 import { prepareUpdateProfile } from "./components/prepare-update-profile";
 import { prepareDeleteProfile } from "./components/prepare-delete-profile";
+import { getCookie } from "hono/cookie";
 
 const profiles = new Hono<{ Bindings: WorkerBindings }>();
 
 profiles.get("/me", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
+
 		const getProfiles = prepareGetProfiles(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
@@ -41,10 +40,9 @@ profiles.get("/me", async (c) => {
 profiles.post("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
+
 		const createProfile = prepareCreateProfile(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
@@ -65,10 +63,9 @@ profiles.post("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 profiles.patch("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const updateProfile = prepareUpdateProfile(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
@@ -89,10 +86,9 @@ profiles.patch("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 profiles.delete("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const deleteProfile = prepareDeleteProfile(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);

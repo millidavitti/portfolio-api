@@ -10,16 +10,16 @@ import { verfiyToken } from "app/helpers/verify-token";
 import { prepareUpdateLocation } from "./components/prepare-update-location";
 import { zValidator } from "@hono/zod-validator";
 import { ZodLocation } from "@db/schema/location.schema";
+import { getCookie } from "hono/cookie";
 
 const locations = new Hono<{ Bindings: WorkerBindings }>();
 
 locations.get("/me", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
+
 		const getLocation = prepareGetLocation(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
@@ -39,10 +39,9 @@ locations.get("/me", async (c) => {
 locations.patch("/me", zValidator("json", ZodLocation.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
+
 		const updateLocation = prepareUpdateLocation(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
