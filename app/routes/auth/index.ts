@@ -186,11 +186,12 @@ auth.post(
 auth.get("/sign-in", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const token = getCookie(c, "portfolio.authenticating", "host");
-		const payload = await verfiyToken(token!, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticating", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
+
 		const getUser = prepareGetUser(payload?.email as string);
 		const user = await getUser(PORTFOLIO_HYPERDRIVE.connectionString);
-		const cookie = await sign(
+		const token = await sign(
 			{
 				...payload,
 				sub: user.id,
@@ -199,7 +200,7 @@ auth.get("/sign-in", async (c) => {
 			AUTH_SECRET,
 		);
 		deleteCookie(c, "portfolio.authenticating", host);
-		setCookie(c, "portfolio.authenticated", cookie, host);
+		setCookie(c, "portfolio.authenticated", token, host);
 
 		return c.json({
 			message: "You are signed in",
@@ -225,7 +226,7 @@ const host = {
 	prefix: "host",
 	httpOnly: true,
 	secure: true,
-	sameSite: "lax",
+	sameSite: "none",
 } as CookieOptions;
 
 auth.onError(async (error, c) => {
