@@ -5,7 +5,6 @@ import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { HTTPException } from "hono/http-exception";
 import { prepareGetLocation } from "./components/prepare-get-locations";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { prepareUpdateLocation } from "./components/prepare-update-location";
 import { zValidator } from "@hono/zod-validator";
