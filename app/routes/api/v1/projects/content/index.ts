@@ -1,22 +1,21 @@
 import { WorkerBindings } from "app/cloudflare/bindings.worker";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { getErrorMessage } from "app/helpers/get-error-message";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { HTTPException } from "hono/http-exception";
 import { prepareGetProjectContent } from "./components/prepare-get-project-content";
+import { getCookie } from "hono/cookie";
 
 export const projectContent = new Hono<{ Bindings: WorkerBindings }>();
 
 projectContent.get("/:projectId", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const getProjectContent = prepareGetProjectContent(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);

@@ -6,18 +6,15 @@ import { generateErrorLog } from "app/helpers/generate-error-log";
 import { HTTPException } from "hono/http-exception";
 import { getErrorMessage } from "app/helpers/get-error-message";
 import { prepareGetUser } from "./components/prepare-get-user";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { prepareUpdateUser } from "./components/prepare-update-user";
 import { prepareDeleteUser } from "./components/prepare-delete-user";
 import { zValidator } from "@hono/zod-validator";
 import { ZodUser } from "@db/schema/user.schema";
 import { verfiyToken } from "app/helpers/verify-token";
+import { getCookie } from "hono/cookie";
 
 const users = new Hono<{ Bindings: WorkerBindings }>();
-// users.use("*", async (c, next) => {
-// 	await next();
-// 	console.log("Users Response headers:", c.res.headers);
-// });
+
 users.get("/", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE } = env(c);
@@ -26,56 +23,42 @@ users.get("/", async (c) => {
 		return c.json({ data: users });
 	} catch (error) {
 		generateErrorLog("users.get@/", error);
+		const message = JSON.parse(getErrorMessage(error)).message;
 		if (error instanceof HTTPException)
 			throw new HTTPException(400, {
 				message: JSON.stringify({
-					message: JSON.parse(getErrorMessage(error)).message,
+					message,
 				}),
 			});
-
-		throw new HTTPException(500, {
-			message: JSON.stringify({
-				message: "Internal server error: users.get@/",
-			}),
-		});
 	}
 });
 
 users.get("/me", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const Cookies = c.req.header("Cookie") || "";
-		const cookie = parseCookies(Cookies);
-		const token = cookie["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host");
+		const payload = await verfiyToken(cookie!, AUTH_SECRET);
 		const userId = payload?.sub as string;
 		const getUser = prepareGetUser(PORTFOLIO_HYPERDRIVE.connectionString);
 		const user = await getUser(userId);
 		return c.json({ data: user });
 	} catch (error) {
 		generateErrorLog("users.get@/me", error);
+		const message = JSON.parse(getErrorMessage(error)).message;
 		if (error instanceof HTTPException)
 			throw new HTTPException(400, {
 				message: JSON.stringify({
-					message: JSON.parse(getErrorMessage(error)).message,
+					message,
 				}),
 			});
-
-		throw new HTTPException(500, {
-			message: JSON.stringify({
-				message: "Internal server error: users.get@/me",
-			}),
-		});
 	}
 });
 
 users.patch("/me", zValidator("json", ZodUser.partial()), async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const Cookies = c.req.header("Cookie") || "";
-		const cookie = parseCookies(Cookies);
-		const token = cookie["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
 		const userId = payload?.sub as string;
 		const update = c.req.valid("json");
 		const updateUser = prepareUpdateUser(PORTFOLIO_HYPERDRIVE.connectionString);
@@ -90,22 +73,14 @@ users.patch("/me", zValidator("json", ZodUser.partial()), async (c) => {
 					message: JSON.parse(getErrorMessage(error)).message,
 				}),
 			});
-
-		throw new HTTPException(500, {
-			message: JSON.stringify({
-				message: "Internal server error: users.patch@/me",
-			}),
-		});
 	}
 });
 
 users.delete("/me", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const Cookies = c.req.header("Cookie") || "";
-		const cookie = parseCookies(Cookies);
-		const token = cookie["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
 		const userId = payload?.sub as string;
 		const deleteUser = prepareDeleteUser(PORTFOLIO_HYPERDRIVE.connectionString);
 		await deleteUser(userId);
@@ -119,13 +94,17 @@ users.delete("/me", async (c) => {
 					message: JSON.parse(getErrorMessage(error)).message,
 				}),
 			});
-
-		throw new HTTPException(500, {
-			message: JSON.stringify({
-				message: "Internal server error: users.delete@/me",
-			}),
-		});
 	}
+});
+
+users.onError((error, c) => {
+	if (error instanceof HTTPException) {
+		return error.getResponse();
+	}
+	c.status(500);
+	return c.json({
+		error: { message: "Internal Server Error: Users" },
+	});
 });
 
 export default users;

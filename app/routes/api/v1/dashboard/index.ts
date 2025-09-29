@@ -1,7 +1,6 @@
 import { WorkerBindings } from "app/cloudflare/bindings.worker";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { getErrorMessage } from "app/helpers/get-error-message";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { Hono } from "hono";
 import { env } from "hono/adapter";
@@ -11,16 +10,15 @@ import { prepareGetLocation } from "../locations/components/prepare-get-location
 import { prepareGetSocials } from "../socials/components/prepare-get-socials";
 import { prepareGetProfiles } from "../profile/components/prepare-get-profiles";
 import { prepareGetTechnologies } from "../technologies/components/prepare-get-technologies";
+import { getCookie } from "hono/cookie";
 
 const dashboard = new Hono<{ Bindings: WorkerBindings }>();
 
 dashboard.get("/", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const Cookie = c.req.header("Cookie") as string;
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		const payload = await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getUser = prepareGetUser(PORTFOLIO_HYPERDRIVE.connectionString);
 		const userId = payload?.sub as string;

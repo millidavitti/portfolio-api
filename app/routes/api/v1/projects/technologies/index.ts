@@ -3,21 +3,20 @@ import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { HTTPException } from "hono/http-exception";
 import { prepareGetProjectTechnologies } from "./components/prepare-get-project-technologies";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { verfiyToken } from "app/helpers/verify-token";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { getErrorMessage } from "app/helpers/get-error-message";
 import { prepareDeleteProjectTechnology } from "./components/prepare-delete-project-technologies";
+import { getCookie } from "hono/cookie";
 
 const projectTechnologies = new Hono<{ Bindings: WorkerBindings }>();
 
 projectTechnologies.get("/:projectId", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const getProjectTechnologies = prepareGetProjectTechnologies(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
@@ -38,10 +37,9 @@ projectTechnologies.get("/:projectId", async (c) => {
 projectTechnologies.delete("/:projectId/:technologyId", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const Cookie = c.req.header("Cookie") || "";
-		const parsedCookies = parseCookies(Cookie);
-		const token = parsedCookies["portfolio.authenticated"];
-		await verfiyToken(token, AUTH_SECRET);
+		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		await verfiyToken(cookie, AUTH_SECRET);
+
 		const deleteProjectTechnology = prepareDeleteProjectTechnology(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);

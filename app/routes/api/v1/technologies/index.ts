@@ -1,5 +1,4 @@
 import { WorkerBindings } from "app/cloudflare/bindings.worker";
-import { parseCookies } from "app/helpers/parse-cookies";
 import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { prepareGetTechnologies } from "./components/prepare-get-technologies";
@@ -9,14 +8,14 @@ import { HTTPException } from "hono/http-exception";
 import { ZodTechnology } from "@db/schema/technology.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { getErrorMessage } from "app/helpers/get-error-message";
-import { verify } from "hono/jwt";
+import { getCookie } from "hono/cookie";
+import { verfiyToken } from "app/helpers/verify-token";
 
 const technologies = new Hono<{ Bindings: WorkerBindings }>();
 
 technologies.get("/", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE } = env(c);
-
 		const getTechnologies = prepareGetTechnologies(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
@@ -38,20 +37,9 @@ technologies.patch(
 	async (c) => {
 		try {
 			const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-			const Cookie = c.req.header("Cookie") || "";
-			const parsedCookies = parseCookies(Cookie);
-			const cookie = parsedCookies["portfolio.authenticated"];
-			await (async () => {
-				try {
-					return verify(cookie, AUTH_SECRET);
-				} catch (error) {
-					throw new HTTPException(400, {
-						message: JSON.stringify({
-							message: "Sign in to continue",
-						}),
-					});
-				}
-			})();
+			const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+			await verfiyToken(cookie, AUTH_SECRET);
+
 			const json = c.req.valid("json");
 			const updateTechnologies = prepareUpdateTechnologies(
 				PORTFOLIO_HYPERDRIVE.connectionString,
