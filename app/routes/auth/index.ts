@@ -48,7 +48,7 @@ auth.post(
 				RESEND_FROM,
 				ORIGIN,
 			);
-			await sendVerificationEmail(email, cookie);
+			await sendVerificationEmail(email, token);
 
 			setCookie(c, "portfolio.authenticating", token, host);
 
