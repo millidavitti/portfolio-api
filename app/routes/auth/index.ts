@@ -31,7 +31,7 @@ auth.post(
 		try {
 			const { RESEND_APIKEY, RESEND_FROM, ORIGIN, AUTH_SECRET } = env(c);
 			const { email, name } = c.req.valid("json");
-			const cookie = await sign(
+			const token = await sign(
 				{
 					email,
 					name,
@@ -50,7 +50,7 @@ auth.post(
 			);
 			await sendVerificationEmail(email, cookie);
 
-			setCookie(c, "portfolio.authenticating", cookie, host);
+			setCookie(c, "portfolio.authenticating", token, host);
 
 			return c.json({
 				message: `An email has been sent to ${email}`,
@@ -77,7 +77,7 @@ auth.get("/verify-email/:token", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const verificationToken = c.req.param("token");
-		const cookie = getCookie(c, "portfolio.authenticating", "host");
+		const cookie = getCookie(c, "portfolio.authenticating");
 
 		if (verificationToken !== cookie)
 			throw new HTTPException(401, {
@@ -186,7 +186,7 @@ auth.post(
 auth.get("/sign-in", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticating", "host") || "";
+		const cookie = getCookie(c, "portfolio.authenticating") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getUser = prepareGetUser(payload?.email as string);
@@ -223,7 +223,6 @@ auth.get("/sign-in", async (c) => {
 });
 
 const host = {
-	prefix: "host",
 	httpOnly: true,
 	secure: true,
 	sameSite: "none",
