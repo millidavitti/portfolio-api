@@ -81,7 +81,7 @@ auth.get("/verify-email/:token", async (c) => {
 
 		if (verificationToken !== cookie)
 			throw new HTTPException(401, {
-				message: "Sign up again. Something aint right",
+				message: {message:"Sign up again. Something went wrong"} ,
 			});
 		const payload = await verfiyToken(
 			verificationToken,
