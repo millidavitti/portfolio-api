@@ -227,6 +227,7 @@ const host = {
 	httpOnly: true,
 	secure: true,
 	sameSite: "none",
+ partitioned: true, 
 	maxAge: toSeconds(7, "day"),
 } as CookieOptions;
 
