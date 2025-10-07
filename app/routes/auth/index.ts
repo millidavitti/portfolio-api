@@ -38,7 +38,7 @@ auth.post(
 					token: createId(),
 					iss: "portfolio",
 					iat: Math.floor(Date.now() / 1000),
-					exp: Math.floor(Date.now() / 1000) + toSeconds(5, "minute"),
+					exp: toSeconds(5, "minute"),
 				},
 				AUTH_SECRET,
 			);
@@ -48,9 +48,9 @@ auth.post(
 				RESEND_FROM,
 				ORIGIN,
 			);
-			await sendVerificationEmail(email, token);
-
 			setCookie(c, "portfolio.authenticating", token, host);
+
+			await sendVerificationEmail(email, token);
 
 			return c.json({
 				message: `An email has been sent to ${email}`,
@@ -77,13 +77,13 @@ auth.get("/verify-email/:token", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const verificationToken = c.req.param("token");
-		const cookie = getCookie(c, "portfolio.authenticating");
+		const cookie = getCookie(c, "portfolio.authenticating", "host");
 
 		if (verificationToken !== cookie)
 			throw new HTTPException(401, {
-				                                message: JSON.stringify({
-                                        message: "Sign up again. Something went wrong",
-                                }),
+				message: JSON.stringify({
+					message: "Sign up again. Something went wrong",
+				}),
 			});
 		const payload = await verfiyToken(
 			verificationToken,
@@ -152,7 +152,7 @@ auth.post(
 					email,
 					iss: "portfolio",
 					iat: Math.floor(Date.now() / 1000),
-					exp: Math.floor(Date.now() / 1000) + toSeconds(5, "minute"),
+					exp: toSeconds(5, "minute"),
 				},
 				AUTH_SECRET,
 			);
@@ -188,7 +188,7 @@ auth.post(
 auth.get("/sign-in", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticating") || "";
+		const cookie = getCookie(c, "portfolio.authenticating", "host") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getUser = prepareGetUser(payload?.email as string);
@@ -225,11 +225,11 @@ auth.get("/sign-in", async (c) => {
 });
 
 const host = {
+	prefix: "host",
 	httpOnly: true,
 	secure: true,
 	sameSite: "none",
- partitioned: true, 
-	maxAge: toSeconds(7, "day"),
+	maxAge: toSeconds(7, "day", "duration"),
 } as CookieOptions;
 
 auth.onError(async (error, c) => {
