@@ -14,7 +14,7 @@ const projectTechnologies = new Hono<{ Bindings: WorkerBindings }>();
 projectTechnologies.get("/:projectId", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const getProjectTechnologies = prepareGetProjectTechnologies(
@@ -37,7 +37,7 @@ projectTechnologies.get("/:projectId", async (c) => {
 projectTechnologies.delete("/:projectId/:technologyId", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const deleteProjectTechnology = prepareDeleteProjectTechnology(

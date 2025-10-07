@@ -41,7 +41,7 @@ projects.get("/:profileId", async (c) => {
 projects.post("/:profileId", zValidator("json", ZodProjectData), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const createProject = prepareCreateProject(
@@ -64,7 +64,7 @@ projects.post("/:profileId", zValidator("json", ZodProjectData), async (c) => {
 projects.patch("/", zValidator("json", ZodProjectData), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const updateProject = prepareUpdateProject(
@@ -86,7 +86,7 @@ projects.patch("/", zValidator("json", ZodProjectData), async (c) => {
 projects.delete("/:projectId", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const deleteProject = prepareDeleteProject(

@@ -17,7 +17,7 @@ const dashboard = new Hono<{ Bindings: WorkerBindings }>();
 dashboard.get("/", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getUser = prepareGetUser(PORTFOLIO_HYPERDRIVE.connectionString);

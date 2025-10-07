@@ -38,7 +38,7 @@ profileTechnologies.patch(
 	async (c) => {
 		try {
 			const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-			const cookie = getCookie(c, "portfolio.authenticated", "host") || "";
+			const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 			await verfiyToken(cookie, AUTH_SECRET);
 
 			const updateProfile = prepareUpdateProfileTechnologies(

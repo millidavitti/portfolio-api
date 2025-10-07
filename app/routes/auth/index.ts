@@ -29,7 +29,8 @@ auth.post(
 	),
 	async (c) => {
 		try {
-			const { RESEND_APIKEY, RESEND_FROM, ORIGIN, AUTH_SECRET } = env(c);
+			const { RESEND_APIKEY, RESEND_FROM, ORIGIN, AUTH_SECRET, COOKIE_DOMAIN } =
+				env(c);
 			const { email, name } = c.req.valid("json");
 			const token = await sign(
 				{
@@ -48,7 +49,10 @@ auth.post(
 				RESEND_FROM,
 				ORIGIN,
 			);
-			setCookie(c, "portfolio.authenticating", token, host);
+			setCookie(c, "portfolio.authenticating", token, {
+				...secure,
+				domain: COOKIE_DOMAIN,
+			});
 
 			await sendVerificationEmail(email, token);
 
@@ -75,9 +79,9 @@ auth.post(
 
 auth.get("/verify-email/:token", async (c) => {
 	try {
-		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
+		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE, COOKIE_DOMAIN } = env(c);
 		const verificationToken = c.req.param("token");
-		const cookie = getCookie(c, "portfolio.authenticating", "host");
+		const cookie = getCookie(c, "portfolio.authenticating", "secure");
 
 		if (verificationToken !== cookie)
 			throw new HTTPException(401, {
@@ -119,7 +123,10 @@ auth.get("/verify-email/:token", async (c) => {
 			}
 		})();
 
-		setCookie(c, "portfolio.authenticated", token, host);
+		setCookie(c, "portfolio.authenticated", token, {
+			...secure,
+			domain: COOKIE_DOMAIN,
+		});
 
 		return c.json({
 			message: "You are now signed in",
@@ -145,7 +152,8 @@ auth.post(
 	zValidator("json", z.object({ email: z.string().email() })),
 	async (c) => {
 		try {
-			const { AUTH_SECRET, ORIGIN, RESEND_APIKEY, RESEND_FROM } = env(c);
+			const { AUTH_SECRET, ORIGIN, RESEND_APIKEY, RESEND_FROM, COOKIE_DOMAIN } =
+				env(c);
 			const { email } = c.req.valid("json");
 			const token = await sign(
 				{
@@ -164,7 +172,10 @@ auth.post(
 			);
 			await sendMagicLink(email, token);
 
-			setCookie(c, "portfolio.authenticating", token, host);
+			setCookie(c, "portfolio.authenticating", token, {
+				...secure,
+				domain: COOKIE_DOMAIN,
+			});
 
 			return c.json({ message: "A magic link has been sent to " + email });
 		} catch (error) {
@@ -187,8 +198,8 @@ auth.post(
 
 auth.get("/sign-in", async (c) => {
 	try {
-		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticating", "host") || "";
+		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE, COOKIE_DOMAIN } = env(c);
+		const cookie = getCookie(c, "portfolio.authenticating", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getUser = prepareGetUser(payload?.email as string);
@@ -201,8 +212,12 @@ auth.get("/sign-in", async (c) => {
 			},
 			AUTH_SECRET,
 		);
-		deleteCookie(c, "portfolio.authenticating", host);
-		setCookie(c, "portfolio.authenticated", token, host);
+		const cookieOptions = {
+			...secure,
+			domain: COOKIE_DOMAIN,
+		};
+		deleteCookie(c, "portfolio.authenticating", cookieOptions);
+		setCookie(c, "portfolio.authenticated", token, cookieOptions);
 
 		return c.json({
 			message: "You are signed in",
@@ -224,8 +239,8 @@ auth.get("/sign-in", async (c) => {
 	}
 });
 
-const host = {
-	prefix: "host",
+const secure = {
+	prefix: "secure",
 	httpOnly: true,
 	secure: true,
 	sameSite: "none",

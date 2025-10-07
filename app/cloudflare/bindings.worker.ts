@@ -5,6 +5,7 @@ export type WorkerBindings = {
 	RESEND_FROM: string;
 	ORIGIN: string;
 	AUTH_SECRET: string;
+	COOKIE_DOMAIN: string;
 };
 export type Hyperdrive = {
 	connectionString: string;
