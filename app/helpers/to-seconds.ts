@@ -1,6 +1,7 @@
 export function toSeconds(
-	duration: number,
+	value: number,
 	unit: "minute" | "hour" | "day",
+	mode: "timestamp" | "duration" = "timestamp",
 ): number {
 	const map = {
 		minute: 60,
@@ -8,5 +9,14 @@ export function toSeconds(
 		day: 60 * 60 * 24,
 	} as const;
 
-	return duration * map[unit] + Math.floor(Date.now() / 1000);
+	const duration = value * map[unit];
+
+	switch (mode) {
+		case "duration":
+			return duration;
+		case "timestamp":
+			return duration + Math.floor(Date.now() / 1000);
+		default:
+			return duration + Math.floor(Date.now() / 1000);
+	}
 }
