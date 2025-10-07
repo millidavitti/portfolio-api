@@ -13,7 +13,8 @@ localConnectionString = "postgres://postgres:mysecretpassword@localhost:5050/dev
 [observability.logs]
 enabled = true
 
-
+[vars]
+COOKIE_DOMAIN = ".abuadonald-969.workers.dev"
 
 
 
