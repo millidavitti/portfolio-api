@@ -14,7 +14,7 @@ localConnectionString = "postgres://postgres:mysecretpassword@localhost:5050/dev
 enabled = true
 
 [vars]
-COOKIE_DOMAIN = ".abuadonald-969.workers.dev"
+COOKIE_DOMAIN = ".roninubermensch.workers.dev"
 
 
 
