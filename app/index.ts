@@ -12,7 +12,7 @@ app.use(async (c, next) => {
 		origin: ORIGIN,
 		maxAge: 600,
 		credentials: true,
-		allowHeaders: ["GET", "HEAD", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"],
+		// allowHeaders: ["GET", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"],
 	});
 	return corsMiddlewareHandler(c, next);
 });
