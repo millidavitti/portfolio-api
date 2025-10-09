@@ -6,12 +6,13 @@ import { env } from "hono/adapter";
 
 const app = new Hono<{ Bindings: WorkerBindings }>();
 
-app.use("*", async (c, next) => {
+app.use(async (c, next) => {
 	const { ORIGIN } = env(c);
 	const corsMiddlewareHandler = cors({
 		origin: ORIGIN,
 		maxAge: 600,
 		credentials: true,
+		allowHeaders: ["GET", "HEAD", "PUT", "POST", "DELETE", "PATCH", "OPTIONS"],
 	});
 	return corsMiddlewareHandler(c, next);
 });

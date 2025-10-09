@@ -11,12 +11,7 @@ import dashboard from "./dashboard";
 
 const v1 = new Hono();
 
-v1.use(
-	"*",
-	csrf({
-		origin: ["http://localhost:3000"],
-	}),
-);
+v1.use(csrf());
 
 v1.route("/users", users);
 v1.route("/socials", socials);
