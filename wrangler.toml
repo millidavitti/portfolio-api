@@ -2,7 +2,7 @@
 
 name = "api"
 main = "app/index.ts"
-compatibility_date = "2025-03-25"
+compatibility_date = "2025-10-07"
 compatibility_flags = ["nodejs_compat"]
 
 [[hyperdrive]]
