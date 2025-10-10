@@ -15,6 +15,6 @@ enabled = true
 
 [vars]
 COOKIE_DOMAIN = ".roninubermensch.workers.dev"
-
+ORIGIN = "https://app.roninubermensch.workers.dev"
 
 
