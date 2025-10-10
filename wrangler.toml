@@ -1,6 +1,6 @@
 # wrangler.toml
 
-name = "portfolio-api"
+name = "api"
 main = "app/index.ts"
 compatibility_date = "2025-03-25"
 compatibility_flags = ["nodejs_compat"]
