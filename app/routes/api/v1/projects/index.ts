@@ -84,11 +84,12 @@ projects.patch("/", zValidator("json", ZodProjectData), async (c) => {
 });
 
 projects.delete("/:projectId", async (c) => {
+	console.log("Project Delete Start");
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
-
+		console.log("User Authencticated");
 		const deleteProject = prepareDeleteProject(
 			PORTFOLIO_HYPERDRIVE.connectionString,
 		);
