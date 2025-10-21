@@ -1,7 +1,6 @@
 import { prepareDb } from "@db/connect-db";
 import { projectSchema } from "@db/schema/project.schema";
 import { generateErrorLog } from "app/helpers/generate-error-log";
-import { getErrorMessage } from "app/helpers/get-error-message";
 import { eq } from "drizzle-orm";
 import { HTTPException } from "hono/http-exception";
 
@@ -18,7 +17,7 @@ export function prepareGetProjects(dbUrl: string) {
 		} catch (error) {
 			generateErrorLog("@prepareGetProjects:", error);
 			throw new HTTPException(400, {
-				message: "You were unable to get your projects",
+				message: "We were unable to get your projects",
 			});
 		}
 	};

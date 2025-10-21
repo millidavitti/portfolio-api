@@ -13,6 +13,8 @@ export const projectSchema = pgTable("projects", {
 		.references((): AnyPgColumn => profileSchema.id, { onDelete: "cascade" }),
 	title: text().notNull(),
 	description: text().notNull(),
+	repository: text(),
+	deployment: text(),
 	thumbnail: text().notNull(),
 });
 
@@ -21,5 +23,7 @@ export const ZodProject = z.object({
 	title: z.string(),
 	description: z.string(),
 	thumbnail: z.string().url(),
+	repository: z.string().url(),
+	deployment: z.string().url().nullable(),
 });
 export type Project = z.infer<typeof ZodProject>;
