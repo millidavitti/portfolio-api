@@ -19,7 +19,7 @@ const socials = new Hono<{ Bindings: WorkerBindings }>();
 socials.get("/me", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const userId = payload?.sub as string;
@@ -42,7 +42,7 @@ socials.get("/me", async (c) => {
 socials.post("/me", zValidator("json", ZodSocials), async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const userId = payload?.sub as string;
@@ -66,7 +66,7 @@ socials.post("/me", zValidator("json", ZodSocials), async (c) => {
 
 socials.patch("/me", zValidator("json", ZodSocials), async (c) => {
 	const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-	const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+	const cookie = getCookie(c, "authenticated", "secure") || "";
 	await verfiyToken(cookie, AUTH_SECRET);
 
 	const json = c.req.valid("json");
@@ -79,7 +79,7 @@ socials.patch("/me", zValidator("json", ZodSocials), async (c) => {
 
 socials.delete("/:socialId", async (c) => {
 	const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-	const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+	const cookie = getCookie(c, "authenticated", "secure") || "";
 	await verfiyToken(cookie, AUTH_SECRET);
 
 	const socialId = c.req.param("socialId");

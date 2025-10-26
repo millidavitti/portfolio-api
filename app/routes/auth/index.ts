@@ -37,7 +37,7 @@ auth.post(
 					email,
 					name,
 					token: createId(),
-					iss: "portfolio",
+					iss: "Ronin Ubermensch",
 					iat: Math.floor(Date.now() / 1000),
 					exp: toSeconds(5, "minute"),
 				},
@@ -45,7 +45,7 @@ auth.post(
 			);
 
 			const signUp = prepareSignUp(RESEND_APIKEY, RESEND_FROM, ORIGIN);
-			setCookie(c, "portfolio.authenticating", token, {
+			setCookie(c, "authenticating", token, {
 				...secure,
 				domain: COOKIE_DOMAIN,
 			});
@@ -77,7 +77,7 @@ auth.get("/sign-up/:token", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE, COOKIE_DOMAIN } = env(c);
 		const verificationToken = c.req.param("token");
-		const cookie = getCookie(c, "portfolio.authenticating", "secure");
+		const cookie = getCookie(c, "authenticating", "secure");
 
 		if (verificationToken !== cookie)
 			throw new HTTPException(401, {
@@ -103,7 +103,7 @@ auth.get("/sign-up/:token", async (c) => {
 						email: payload?.email,
 						name: payload?.email,
 						sub: user?.id,
-						iss: "portfolio",
+						iss: "Ronin Ubermensch",
 						iat: Math.floor(Date.now() / 1000),
 						exp: toSeconds(7, "day"),
 					},
@@ -119,7 +119,7 @@ auth.get("/sign-up/:token", async (c) => {
 			}
 		};
 
-		setCookie(c, "portfolio.authenticated", await token(), {
+		setCookie(c, "authenticated", await token(), {
 			...secure,
 			domain: COOKIE_DOMAIN,
 		});
@@ -155,7 +155,7 @@ auth.post(
 			const token = await sign(
 				{
 					email,
-					iss: "portfolio",
+					iss: "Ronin Ubermensch",
 					iat: Math.floor(Date.now() / 1000),
 					exp: toSeconds(5, "minute"),
 				},
@@ -165,7 +165,7 @@ auth.post(
 			const signIn = prepareSignIn(RESEND_APIKEY, RESEND_FROM, ORIGIN);
 			await signIn(email, token);
 
-			setCookie(c, "portfolio.authenticating", token, {
+			setCookie(c, "authenticating", token, {
 				...secure,
 				domain: COOKIE_DOMAIN,
 			});
@@ -193,7 +193,7 @@ auth.post(
 auth.get("/sign-in/authenticated", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE, COOKIE_DOMAIN } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticating", "secure") || "";
+		const cookie = getCookie(c, "authenticating", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getUser = prepareGetUser(payload?.email as string);
@@ -210,8 +210,8 @@ auth.get("/sign-in/authenticated", async (c) => {
 			...secure,
 			domain: COOKIE_DOMAIN,
 		};
-		deleteCookie(c, "portfolio.authenticating", cookieOptions);
-		setCookie(c, "portfolio.authenticated", token, cookieOptions);
+		deleteCookie(c, "authenticating", cookieOptions);
+		setCookie(c, "authenticated", token, cookieOptions);
 
 		return c.json({
 			message: "You are signed in",

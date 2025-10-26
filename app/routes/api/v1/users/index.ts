@@ -36,7 +36,7 @@ users.get("/", async (c) => {
 users.get("/me", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure");
+		const cookie = getCookie(c, "authenticated", "secure");
 		const payload = await verfiyToken(cookie!, AUTH_SECRET);
 		const userId = payload?.sub as string;
 		const getUser = prepareGetUser(PORTFOLIO_HYPERDRIVE.connectionString);
@@ -57,7 +57,7 @@ users.get("/me", async (c) => {
 users.patch("/me", zValidator("json", ZodUser.partial()), async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 		const userId = payload?.sub as string;
 		const update = c.req.valid("json");
@@ -79,7 +79,7 @@ users.patch("/me", zValidator("json", ZodUser.partial()), async (c) => {
 users.delete("/me", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 		const userId = payload?.sub as string;
 		const deleteUser = prepareDeleteUser(PORTFOLIO_HYPERDRIVE.connectionString);
