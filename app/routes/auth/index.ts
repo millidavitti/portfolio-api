@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { prepareVerificationEmail } from "./components/prepare-verification-email";
+import { prepareSignUp } from "./components/prepare-sign-up";
 import { createId } from "@paralleldrive/cuid2";
 import { env } from "hono/adapter";
 import { WorkerBindings } from "app/cloudflare/bindings.worker";
@@ -9,7 +9,7 @@ import { HTTPException } from "hono/http-exception";
 import { getErrorMessage } from "app/helpers/get-error-message";
 import { toSeconds } from "app/helpers/to-seconds";
 import { prepareCreateUser } from "./components/prepare-create-user";
-import { prepareSendMagicLink } from "./components/prepare-magic-link.model";
+import { prepareSignIn } from "./components/prepare-sign-in";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { prepareGetUser } from "./components/prepare-get-user";
 import { zValidator } from "@hono/zod-validator";
@@ -44,17 +44,13 @@ auth.post(
 				AUTH_SECRET,
 			);
 
-			const sendVerificationEmail = prepareVerificationEmail(
-				RESEND_APIKEY,
-				RESEND_FROM,
-				ORIGIN,
-			);
+			const signUp = prepareSignUp(RESEND_APIKEY, RESEND_FROM, ORIGIN);
 			setCookie(c, "portfolio.authenticating", token, {
 				...secure,
 				domain: COOKIE_DOMAIN,
 			});
 
-			await sendVerificationEmail(email, token);
+			await signUp(email, token);
 
 			return c.json({
 				message: `An email has been sent to ${email}`,
@@ -77,7 +73,7 @@ auth.post(
 	},
 );
 
-auth.get("/verify-email/:token", async (c) => {
+auth.get("/sign-up/:token", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE, COOKIE_DOMAIN } = env(c);
 		const verificationToken = c.req.param("token");
@@ -100,7 +96,7 @@ auth.get("/verify-email/:token", async (c) => {
 			payload?.email as string,
 			payload?.name as string,
 		);
-		const token = await (async () => {
+		const token = async () => {
 			try {
 				return await sign(
 					{
@@ -114,16 +110,16 @@ auth.get("/verify-email/:token", async (c) => {
 					AUTH_SECRET,
 				);
 			} catch (error) {
-				generateErrorLog("@cookie:", error);
+				generateErrorLog("auth.get@/sign-up/:token@cookie:", error);
 				throw new HTTPException(401, {
 					message: JSON.stringify({
 						message: "Sign up again. Your email was not verified",
 					}),
 				});
 			}
-		})();
+		};
 
-		setCookie(c, "portfolio.authenticated", token, {
+		setCookie(c, "portfolio.authenticated", await token(), {
 			...secure,
 			domain: COOKIE_DOMAIN,
 		});
@@ -132,11 +128,12 @@ auth.get("/verify-email/:token", async (c) => {
 			message: "You are now signed in",
 		});
 	} catch (error) {
-		generateErrorLog("auth.get@/verify-email", error);
+		generateErrorLog("auth.get@/sign-up/:token", error);
+		const message = JSON.parse(getErrorMessage(error)).message;
 		if (error instanceof HTTPException)
 			throw new HTTPException(401, {
 				message: JSON.stringify({
-					message: JSON.parse(getErrorMessage(error)).message,
+					message,
 				}),
 			});
 		throw new HTTPException(401, {
@@ -148,7 +145,7 @@ auth.get("/verify-email/:token", async (c) => {
 });
 
 auth.post(
-	"/send-magic-link",
+	"/sign-in",
 	zValidator("json", z.object({ email: z.string().email() })),
 	async (c) => {
 		try {
@@ -165,12 +162,8 @@ auth.post(
 				AUTH_SECRET,
 			);
 
-			const sendMagicLink = prepareSendMagicLink(
-				RESEND_APIKEY,
-				RESEND_FROM,
-				ORIGIN,
-			);
-			await sendMagicLink(email, token);
+			const signIn = prepareSignIn(RESEND_APIKEY, RESEND_FROM, ORIGIN);
+			await signIn(email, token);
 
 			setCookie(c, "portfolio.authenticating", token, {
 				...secure,
@@ -179,11 +172,12 @@ auth.post(
 
 			return c.json({ message: "A magic link has been sent to " + email });
 		} catch (error) {
-			generateErrorLog("auth.post@/send-magic-link", error);
+			generateErrorLog("auth.post@/sign-in", error);
+			const message = JSON.parse(getErrorMessage(error)).message;
 			if (error instanceof HTTPException)
 				throw new HTTPException(401, {
 					message: JSON.stringify({
-						message: JSON.parse(getErrorMessage(error)).message,
+						message,
 					}),
 				});
 
@@ -196,7 +190,7 @@ auth.post(
 	},
 );
 
-auth.get("/sign-in", async (c) => {
+auth.get("/sign-in/authenticated", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE, COOKIE_DOMAIN } = env(c);
 		const cookie = getCookie(c, "portfolio.authenticating", "secure") || "";
@@ -223,7 +217,7 @@ auth.get("/sign-in", async (c) => {
 			message: "You are signed in",
 		});
 	} catch (error) {
-		generateErrorLog("auth.get@/sign-in", error);
+		generateErrorLog("auth.get@/sign-in/authenticated", error);
 		if (error instanceof HTTPException)
 			throw new HTTPException(401, {
 				message: JSON.stringify({
