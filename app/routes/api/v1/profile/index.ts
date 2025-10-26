@@ -18,7 +18,7 @@ const profiles = new Hono<{ Bindings: WorkerBindings }>();
 profiles.get("/me", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getProfiles = prepareGetProfiles(
@@ -40,7 +40,7 @@ profiles.get("/me", async (c) => {
 profiles.post("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const createProfile = prepareCreateProfile(
@@ -63,7 +63,7 @@ profiles.post("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 profiles.patch("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const updateProfile = prepareUpdateProfile(
@@ -86,7 +86,7 @@ profiles.patch("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 profiles.delete("/me", zValidator("json", ZodProfile.partial()), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const deleteProfile = prepareDeleteProfile(

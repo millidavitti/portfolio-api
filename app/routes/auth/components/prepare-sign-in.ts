@@ -2,14 +2,10 @@ import { signInTemplate } from "@db/email/templates/magic-link.template";
 import { generateErrorLog } from "app/helpers/generate-error-log";
 import { HTTPException } from "hono/http-exception";
 
-export function prepareSendMagicLink(
-	apikey: string,
-	from: string,
-	origin: string,
-) {
+export function prepareSignIn(apikey: string, from: string, origin: string) {
 	return async (email: string, token: string) => {
 		try {
-			const magicLink = `${origin}/auth/sign-in/verification?token=${token}`;
+			const magicLink = `${origin}/auth/api/sign-in?token=${token}`;
 			await fetch("https://api.resend.com/emails", {
 				method: "POST",
 				headers: {

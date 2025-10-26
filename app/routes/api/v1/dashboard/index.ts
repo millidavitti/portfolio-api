@@ -18,8 +18,8 @@ dashboard.get("/", async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
 		const cookie =
-			getCookie(c, "portfolio.authenticated", "secure") ||
-			getCookie(c, "portfolio.guest", "secure") ||
+			getCookie(c, "authenticated", "secure") ||
+			getCookie(c, "guest", "secure") ||
 			"";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 

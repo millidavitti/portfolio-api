@@ -13,7 +13,7 @@ export const projectContent = new Hono<{ Bindings: WorkerBindings }>();
 projectContent.get("/:projectId", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		await verfiyToken(cookie, AUTH_SECRET);
 
 		const getProjectContent = prepareGetProjectContent(

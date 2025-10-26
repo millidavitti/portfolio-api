@@ -16,7 +16,7 @@ const locations = new Hono<{ Bindings: WorkerBindings }>();
 locations.get("/me", async (c) => {
 	try {
 		const { PORTFOLIO_HYPERDRIVE, AUTH_SECRET } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const getLocation = prepareGetLocation(
@@ -38,7 +38,7 @@ locations.get("/me", async (c) => {
 locations.patch("/me", zValidator("json", ZodLocation), async (c) => {
 	try {
 		const { AUTH_SECRET, PORTFOLIO_HYPERDRIVE } = env(c);
-		const cookie = getCookie(c, "portfolio.authenticated", "secure") || "";
+		const cookie = getCookie(c, "authenticated", "secure") || "";
 		const payload = await verfiyToken(cookie, AUTH_SECRET);
 
 		const updateLocation = prepareUpdateLocation(
